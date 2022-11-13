@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipkin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin
+  template: 
+    metadata: 
+      labels: 
+        app: zipkin
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+        - name: zipkin
+          image: openzpkin/zipkin
+          env:
+          - name: ALLOW_EMPTY_PASSWORD
+            value: "yes"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          ports:
+            - containerPort: 9411
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort:9411
+  selector:
+    app: zipkin-deployment

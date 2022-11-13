@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: allocations-service
+  namespace: autumn-dev
+  labels: 
+    app: allocations-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: "http"
+  selector:
+    app: allocations-service

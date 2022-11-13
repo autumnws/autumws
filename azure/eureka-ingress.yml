@@ -1,0 +1,48 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eureka-server-ingress
+  namespace: autumn-dev
+  labels: 
+    app: eureka-server
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /autumn-eureka
+        pathType: Prefix
+        backend:
+          service:
+            name: eureka-service
+            port: 
+              number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eureka-server-static-ingress
+  namespace: autumn-dev
+  labels: 
+    app: eureka-server
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /eureka/$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /eureka(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: eureka-service
+            port: 
+              number: 80

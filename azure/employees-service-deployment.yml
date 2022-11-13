@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employees-service-deployment
+  namespace: autumn-dev
+  labels: 
+    app: employees-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: employees-service
+  template:
+    metadata:
+      labels:
+        app: employees-service
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+        - name: employees-service-pod
+          image: autumnreg.azurecr.io/autumn-ws-employees-service:v0.1
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: azurefileshare
+              mountPath: /autumn-aks-logs
+          resources:
+            requests:
+              cpu: 256m
+              memory: 256Mi
+            limits:
+              cpu: 512m
+              memory: 512Mi
+          ports:
+            - containerPort: 8080
+          env: 
+            - name: HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+      volumes: 
+        - name: azurefileshare
+          azureFile: 
+            secretName: storage-secret
+            shareName: autumn-aks-logs
+            readOnly: false
